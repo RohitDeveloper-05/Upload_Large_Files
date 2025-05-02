@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  upload-large-files-rohit
+
+  Sample SAM Template for upload-large-files-rohit
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  LargeFileBucketRohit:
+    Type: AWS::S3::Bucket
+  LargeFileApiRohit:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+  LargeFileLambdaRohit:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: upload-large-file-rohit/
+      Handler: app.lambdaHandler
+      Runtime: nodejs22.x
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref LargeFileBucketRohit
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref LargeFileBucketRohit
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: post
+            RestApiId: !Ref LargeFileApiRohit
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
+Outputs:
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${LargeFileApiRohit}.execute-api.${AWS::Region}.amazonaws.com/prod"
+  BucketName:
+    Description: "S3 bucket name"
+    Value: !Ref LargeFileBucketRohit
