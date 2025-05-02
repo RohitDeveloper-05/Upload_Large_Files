@@ -25,6 +25,7 @@ axios
         console.log("Printing the extension for the file",contentType)
 
         // Send a PUT request to the pre-signed URL with the form data
+        // I am just trying to check few things
         console.log(contentType)
         axios
             .put(uploadUrl, fileContent, {
