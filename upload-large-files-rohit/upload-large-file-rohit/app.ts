@@ -2,27 +2,44 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-const s3 = new S3Client({}); // uses Lambda’s IAM role & region by default
+const s3 = new S3Client({});
 
-export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const bucketName = process.env.BUCKET_NAME!;
-    const { filename } = JSON.parse(event.body!);
+export const lambdaHandler = async (
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> => {
+  
+  const bucketName = process.env.BUCKET_NAME;
+  if (!bucketName) {
+    throw new Error('Environment variable BUCKET_NAME is required');
+  }
 
-    // build the PutObject command
-    const command = new PutObjectCommand({
-        Bucket: bucketName,
-        Key: filename,
-        // You can also set ContentType, ACL, etc. here
-    });
+  
+  if (!event.body) {
+    throw new Error('Request body is required');
+  }
 
-    // generate a pre-signed URL (expires in 5 minutes)
-    const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
+  let parsed: any;
+  try {
+    parsed = JSON.parse(event.body);
+  } catch {
+    throw new Error('Request body contains invalid JSON');
+  }
 
-    return {
-        statusCode: 200,
-        body: JSON.stringify({
-            uploadUrl,
-            fileKey: filename,
-        }),
-    };
+  
+  const { filename } = parsed;
+  if (!filename || typeof filename !== 'string') {
+    throw new Error('`filename` must be a non-empty string');
+  }
+
+  
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: filename,
+  });
+  const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ uploadUrl, fileKey: filename }),
+  };
 };

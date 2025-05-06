@@ -11,23 +11,25 @@
         "unit": "jest",
         "lint": "eslint '*.ts' --quiet --fix",
         "compile": "tsc",
-        "test": "npm run compile && npm run unit"
+        "test": "jest --passWithNoTests",
+        "test:watch": "jest --watch",
+        "coverage:serve": "npx live-server coverage/lcov-report --port=9000 --quiet"
     },
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.798.0",
-        "@aws-sdk/s3-request-presigner": "^3.798.0",
-        "aws-sdk": "^2.1692.0",
         "axios": "^1.9.0",
         "esbuild": "^0.14.14",
         "mime": "^4.0.7"
     },
     "devDependencies": {
+        "@aws-sdk/client-s3": "^3.803.0",
+        "@aws-sdk/s3-request-presigner": "^3.803.0",
         "@jest/globals": "^29.2.0",
         "@types/aws-lambda": "^8.10.92",
         "@types/jest": "^29.2.0",
         "@types/node": "^20.17.32",
         "@typescript-eslint/eslint-plugin": "^5.10.2",
         "@typescript-eslint/parser": "^5.10.2",
+        "aws-sdk": "^2.1692.0",
         "eslint": "^8.8.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-prettier": "^4.0.0",
