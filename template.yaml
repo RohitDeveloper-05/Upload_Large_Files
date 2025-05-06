@@ -20,7 +20,7 @@ Resources:
   LargeFileLambdaRohit:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: upload-large-file-rohit/
+      CodeUri: ./
       Handler: app.lambdaHandler
       Runtime: nodejs22.x
       Architectures:
@@ -45,7 +45,12 @@ Resources:
         Target: es2020
         Sourcemap: true
         EntryPoints:
-          - app.ts
+          - upload-large-files-rohit/upload-large-file-rohit/app.ts
+        External:
+        - "@aws-sdk/client-s3"
+        - "@aws-sdk/s3-request-presigner"
+        - "aws-sdk"
+        
 
 Outputs:
   ApiEndpoint:
